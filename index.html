@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>InvoiceUnblocker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12243B; --slate:#5B6B7C; --mist:#8A98A6; --line:#E4E9EF; --panel:#F7F9FC;
+    --money:#0A7B63; --moneybg:#E7F3EF; --sev:#B23A32; --sevbg:#FBEDEB; --amber:#9A6B12; --amberbg:#FBF2E1;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 48px 22px;}
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* login */
+  #login{max-width:390px;margin:7vh auto 0 auto;animation:rise .5s ease both;}
+  .lcard{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(18,36,59,.09);}
+  .lhead{background:linear-gradient(180deg,var(--ink),#0C1A2C);color:#fff;padding:26px;}
+  .lhead .lg{font-size:26px;}
+  .lhead .nm{font-family:'Fraunces',serif;font-weight:700;font-size:25px;margin-top:6px;}
+  .lhead .tl{color:#B9C6D4;font-size:13px;margin-top:4px;}
+  .lbody{padding:22px 26px 26px 26px;}
+  .cred{background:var(--panel);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--slate);margin-bottom:14px;}
+  .cred b{color:var(--ink);}
+  label.f{display:block;font-size:12px;color:var(--slate);margin:10px 0 4px 2px;font-weight:600;}
+  input.f{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;color:var(--ink);}
+  input.f:focus{outline:none;border-color:var(--ink);}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;font-weight:600;font-size:13.5px;padding:10px 14px;cursor:pointer;font-family:inherit;transition:transform .1s,border-color .1s,background .1s;}
+  .btn:hover{border-color:var(--ink);background:var(--panel);transform:translateY(-1px);}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);width:100%;margin-top:16px;padding:11px;}
+  .btn.primary:hover{background:#0C1A2C;}
+  .lerr{color:var(--sev);font-size:12.5px;margin-top:8px;min-height:16px;}
+
+  /* app */
+  #app{display:none;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:12px;}
+  .brand{display:flex;align-items:baseline;gap:9px;}
+  .brand .lg{font-size:20px;}
+  .brand .nm{font-family:'Fraunces',serif;font-weight:700;font-size:23px;letter-spacing:-.4px;}
+  .who{color:var(--slate);font-size:12.5px;}
+  .who b{color:var(--ink);}
+  .tag{color:var(--slate);font-size:13px;margin:8px 0 0 0;}
+
+  .hero{display:flex;margin:14px 0 4px 0;border:1px solid var(--line);border-radius:11px;overflow:hidden;animation:rise .45s ease both;}
+  .hero-main{flex:1.5;padding:16px 22px;background:linear-gradient(180deg,var(--moneybg),#F1F8F5);border-right:1px solid var(--line);}
+  .hero-main .cap{color:var(--money);font-size:11.5px;font-weight:600;}
+  .hero-main .val{font-family:'Fraunces',serif;font-weight:700;color:var(--money);font-size:38px;line-height:1.05;margin-top:3px;}
+  .hero-main .note{color:var(--slate);font-size:12.5px;margin-top:6px;}
+  .hero-side{flex:1.2;display:flex;}
+  .hs{flex:1;padding:12px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;}
+  .hs:last-child{border-right:none;}
+  .hs .n{font-family:'Fraunces',serif;font-weight:700;font-size:22px;}
+  .hs .l{color:var(--slate);font-size:11.5px;margin-top:2px;}
+
+  .cols{display:flex;gap:16px;margin-top:10px;align-items:flex-start;}
+  .col{flex:1;min-width:0;}
+  .sec{font-weight:700;font-size:15px;margin:4px 0 6px 0;}
+  .sechint{color:var(--slate);font-size:12px;margin:6px 0 8px 0;}
+  .filters{display:flex;gap:8px;margin-bottom:4px;}
+  select.f{flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:7px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;cursor:pointer;}
+
+  .row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-left:3px solid var(--slate);border-radius:8px;padding:9px 13px;margin-bottom:8px;background:#fff;cursor:pointer;transition:transform .1s,box-shadow .1s,border-color .1s;}
+  .row:hover{transform:translateY(-1px);box-shadow:0 3px 11px rgba(18,36,59,.08);border-left-color:var(--ink);}
+  .row.sev{border-left-color:var(--sev);}
+  .row.sel{border:1.5px solid var(--money);border-left:4px solid var(--money);box-shadow:0 3px 14px rgba(10,123,99,.18);background:var(--moneybg);}
+  .row.done{opacity:.6;border-left-color:var(--money);}
+  .row .main{flex:1;min-width:0;}
+  .row .po{font-weight:700;font-size:14.5px;}
+  .row .vd{color:var(--slate);font-size:12.5px;margin-top:2px;}
+  .chips{margin-top:5px;}
+  .chip{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;margin-right:4px;}
+  .chip-esc{background:var(--amberbg);color:var(--amber);}
+  .chip-auto{background:var(--moneybg);color:var(--money);}
+  .chip-sev{background:var(--sevbg);color:var(--sev);}
+  .chip-done{background:var(--money);color:#fff;}
+  .row .amt{font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--money);white-space:nowrap;}
+
+  .file{border:1px solid var(--line);border-radius:11px;overflow:hidden;animation:rise .3s ease both;}
+  .fhead{background:linear-gradient(180deg,var(--ink),#0C1A2C);color:#fff;padding:12px 16px;}
+  .fhead .po{font-family:'Fraunces',serif;font-weight:700;font-size:18px;}
+  .fhead .sub{color:#B9C6D4;font-size:12px;margin-top:2px;}
+  .nums{display:flex;background:#fff;border-bottom:1px solid var(--line);}
+  .num{flex:1;padding:12px 8px;text-align:center;border-right:1px solid var(--line);}
+  .num:last-child{border-right:none;}
+  .num .k{font-size:10.5px;color:var(--mist);text-transform:uppercase;letter-spacing:.4px;}
+  .num .v{font-family:'Fraunces',serif;font-weight:700;font-size:19px;margin-top:3px;}
+  .num .v.miss{color:var(--sev);}
+  .tband{display:flex;align-items:center;gap:10px;padding:11px 16px;background:var(--sevbg);border-bottom:1px solid var(--line);}
+  .tband.auto{background:var(--moneybg);}
+  .tcode{font-family:'Fraunces',serif;font-weight:700;font-size:15px;color:var(--sev);background:#fff;border:1px solid var(--line);border-radius:6px;padding:3px 10px;white-space:nowrap;}
+  .tband.auto .tcode{color:var(--money);}
+  .tnote{font-size:12.5px;}
+  .expl{background:var(--panel);padding:14px 17px;font-size:14px;line-height:1.6;}
+  .expl h4{margin:0 0 3px 0;font-size:11.5px;color:var(--money);text-transform:uppercase;letter-spacing:.4px;}
+  .expl p{margin:0 0 10px 0;}
+  .expl .sap{font-weight:600;}
+  .actions{padding:12px 16px;background:#fff;border-top:1px solid var(--line);}
+  .cleared-msg{color:var(--money);font-weight:600;font-size:13px;}
+  .cap{color:var(--mist);font-size:11px;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="login">
+    <div class="lcard">
+      <div class="lhead"><div class="lg">&#128274;</div><div class="nm">InvoiceUnblocker</div>
+        <div class="tl">Accounts Payable &mdash; blocked invoice workspace</div></div>
+      <div class="lbody">
+        <div class="cred">Demo login &mdash; User&nbsp;ID: <b>ap.clerk</b> &nbsp;|&nbsp; Password: <b>patchamomma2026</b></div>
+        <label class="f">User ID</label>
+        <input class="f" id="uid" placeholder="ap.clerk" autocomplete="off"/>
+        <label class="f">Password</label>
+        <input class="f" id="pwd" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"/>
+        <div class="lerr" id="lerr"></div>
+        <button class="btn primary" onclick="doLogin()">Sign in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+    <div class="topbar">
+      <div class="brand"><span class="lg">&#128275;</span><span class="nm">InvoiceUnblocker</span></div>
+      <div class="who">Signed in as <b>ap.clerk</b> &nbsp; <a href="#" onclick="logout();return false;" style="color:var(--slate);font-size:12px;">Sign out</a></div>
+    </div>
+    <div class="tag">Blocked SAP invoices, ranked by the money actually stuck &mdash; explained, cleared or escalated.</div>
+
+    <div class="hero">
+      <div class="hero-main"><div class="cap">Total value blocked</div>
+        <div class="val" id="h-total"></div>
+        <div class="note" id="h-note"></div></div>
+      <div class="hero-side">
+        <div class="hs"><div class="n" id="h-auto"></div><div class="l">auto-clearable</div></div>
+        <div class="hs"><div class="n" id="h-esc"></div><div class="l">need a human</div></div>
+        <div class="hs"><div class="n" id="h-cleared">0</div><div class="l">cleared by you</div></div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <div class="sec">Blocked queue</div>
+        <div class="filters">
+          <select class="f" id="f-defect" onchange="render()">
+            <option>All</option><option>Missing goods receipt</option><option>Price mismatch</option><option>Quantity overbilled</option>
+          </select>
+          <select class="f" id="f-path" onchange="render()">
+            <option>All</option><option>Needs a human</option><option>Auto-clearable</option>
+          </select>
+        </div>
+        <div class="sechint" id="count-line"></div>
+        <div id="queue"></div>
+      </div>
+      <div class="col">
+        <div class="sec">Case detail</div>
+        <div class="sechint">Full picture, the fix, and the root-cause explanation.</div>
+        <div id="detail"></div>
+        <div class="cap">Explanations are AI-generated (Google Gemini) from the case data. Synthetic SAP MM data; no confidential information is used.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"rows": [{"po": "45100056", "vendor": "Mcclain, Miller and Henderson", "material": "Response Bearing", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 349, "received": null, "invoiced": 349, "blocked": 1110887.94, "blocked_fmt": "₹11,10,887", "expl": {"what": "Mcclain, Miller and Henderson has billed for 349 units of “Response Bearing”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹11,10,887 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 349 units of “Response Bearing” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100135", "vendor": "Dudley Group", "material": "Yes Bearing", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 205, "received": null, "invoiced": 205, "blocked": 844798.8500000001, "blocked_fmt": "₹8,44,798", "expl": {"what": "Dudley Group has billed for 205 units of “Yes Bearing”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹8,44,798 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 205 units of “Yes Bearing” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100141", "vendor": "Davis and Sons", "material": "Not Bearing", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 471, "received": 471, "invoiced": 471, "blocked": 561187.0800000005, "blocked_fmt": "₹5,61,187", "expl": {"what": "The vendor invoiced “Not Bearing” at ₹6,081.80 per unit, but the purchase order agreed ₹4,890.32 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100095", "vendor": "Reid, Ferguson and Sanchez", "material": "Pick Valve", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 330, "received": null, "invoiced": 330, "blocked": 361208.1, "blocked_fmt": "₹3,61,208", "expl": {"what": "Reid, Ferguson and Sanchez has billed for 330 units of “Pick Valve”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹3,61,208 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 330 units of “Pick Valve” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100133", "vendor": "Wilkerson-Day", "material": "Response Bearing", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 421, "received": null, "invoiced": 421, "blocked": 261057.89, "blocked_fmt": "₹2,61,057", "expl": {"what": "Wilkerson-Day has billed for 421 units of “Response Bearing”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹2,61,057 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 421 units of “Response Bearing” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100142", "vendor": "Mcclain, Miller and Henderson", "material": "Enter Bearing", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 337, "received": 337, "invoiced": 337, "blocked": 250980.75, "blocked_fmt": "₹2,50,980", "expl": {"what": "The vendor invoiced “Enter Bearing” at ₹3,750.62 per unit, but the purchase order agreed ₹3,005.87 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100024", "vendor": "Williams and Sons", "material": "Structure Motor", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 344, "received": 344, "invoiced": 344, "blocked": 168848.95999999996, "blocked_fmt": "₹1,68,848", "expl": {"what": "The vendor invoiced “Structure Motor” at ₹5,412.46 per unit, but the purchase order agreed ₹4,921.62 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100081", "vendor": "Walter, Edwards and Rios", "material": "Brother Cable", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 322, "received": 322, "invoiced": 322, "blocked": 159476.93999999994, "blocked_fmt": "₹1,59,476", "expl": {"what": "The vendor invoiced “Brother Cable” at ₹3,852.80 per unit, but the purchase order agreed ₹3,357.53 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100077", "vendor": "Wilkerson-Day", "material": "Collection Bearing", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 282, "received": 282, "invoiced": 282, "blocked": 134604.2400000001, "blocked_fmt": "₹1,34,604", "expl": {"what": "The vendor invoiced “Collection Bearing” at ₹2,647.79 per unit, but the purchase order agreed ₹2,170.47 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100160", "vendor": "Morales-Jones", "material": "Long Cable", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 202, "received": 202, "invoiced": 202, "blocked": 88286.12, "blocked_fmt": "₹88,286", "expl": {"what": "The vendor invoiced “Long Cable” at ₹2,565.23 per unit, but the purchase order agreed ₹2,128.17 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100185", "vendor": "Walter, Edwards and Rios", "material": "Learn Valve", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 125, "received": 108, "invoiced": 125, "blocked": 84997.95999999996, "blocked_fmt": "₹84,997", "expl": {"what": "The vendor billed for 125 units of “Learn Valve”, but the warehouse only recorded 108 units received. SAP blocked the invoice for the 17-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 17-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100072", "vendor": "Henderson, Ramirez and Lewis", "material": "Response Sensor", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 30, "received": 10, "invoiced": 30, "blocked": 75669.0, "blocked_fmt": "₹75,669", "expl": {"what": "The vendor billed for 30 units of “Response Sensor”, but the warehouse only recorded 10 units received. SAP blocked the invoice for the 20-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 20-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100123", "vendor": "Guzman, Hoffman and Baldwin", "material": "Traditional Panel", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 220, "received": 200, "invoiced": 220, "blocked": 57026.80000000005, "blocked_fmt": "₹57,026", "expl": {"what": "The vendor billed for 220 units of “Traditional Panel”, but the warehouse only recorded 200 units received. SAP blocked the invoice for the 20-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 20-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100084", "vendor": "Galloway-Wyatt", "material": "Learn Valve", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 415, "received": null, "invoiced": 415, "blocked": 56170.25, "blocked_fmt": "₹56,170", "expl": {"what": "Galloway-Wyatt has billed for 415 units of “Learn Valve”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹56,170 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 415 units of “Learn Valve” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100041", "vendor": "Baker and Sons", "material": "Not Bearing", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 292, "received": 292, "invoiced": 292, "blocked": 52542.48000000001, "blocked_fmt": "₹52,542", "expl": {"what": "The vendor invoiced “Not Bearing” at ₹963.00 per unit, but the purchase order agreed ₹783.06 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100198", "vendor": "James Group", "material": "Type Valve", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 377, "received": 377, "invoiced": 377, "blocked": 47072.21999999997, "blocked_fmt": "₹47,072", "expl": {"what": "The vendor invoiced “Type Valve” at ₹885.57 per unit, but the purchase order agreed ₹760.71 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100001", "vendor": "Garcia-James", "material": "I Bearing", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 500, "received": 488, "invoiced": 500, "blocked": 45951.59999999986, "blocked_fmt": "₹45,951", "expl": {"what": "The vendor billed for 500 units of “I Bearing”, but the warehouse only recorded 488 units received. SAP blocked the invoice for the 12-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 12-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100063", "vendor": "Garcia-James", "material": "Long Cable", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 330, "received": 330, "invoiced": 330, "blocked": 42500.70000000001, "blocked_fmt": "₹42,500", "expl": {"what": "The vendor invoiced “Long Cable” at ₹1,363.06 per unit, but the purchase order agreed ₹1,234.27 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100100", "vendor": "Abbott-Munoz", "material": "Example Valve", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 266, "received": 252, "invoiced": 266, "blocked": 38120.73999999999, "blocked_fmt": "₹38,120", "expl": {"what": "The vendor billed for 266 units of “Example Valve”, but the warehouse only recorded 252 units received. SAP blocked the invoice for the 14-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 14-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100002", "vendor": "Garcia-James", "material": "Collection Bearing", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 284, "received": 284, "invoiced": 284, "blocked": 32949.67999999999, "blocked_fmt": "₹32,949", "expl": {"what": "The vendor invoiced “Collection Bearing” at ₹783.91 per unit, but the purchase order agreed ₹667.89 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100184", "vendor": "Gray-Mayo", "material": "Put Motor", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 195, "received": null, "invoiced": 195, "blocked": 27346.800000000003, "blocked_fmt": "₹27,346", "expl": {"what": "Gray-Mayo has billed for 195 units of “Put Motor”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹27,346 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 195 units of “Put Motor” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100195", "vendor": "Walter, Edwards and Rios", "material": "Finally Panel", "defect": "MISSING_GOODS_RECEIPT", "defect_label": "Missing goods receipt", "path": "MUST_ESCALATE", "ordered": 325, "received": null, "invoiced": 325, "blocked": 24696.75, "blocked_fmt": "₹24,696", "expl": {"what": "Walter, Edwards and Rios has billed for 325 units of “Finally Panel”, but SAP has no record of the warehouse receiving them — the goods receipt is missing. Because there is nothing to confirm the items arrived, the full ₹24,696 is blocked.", "why": "Either the warehouse received the stock but hasn't posted the goods receipt in the system yet, or the vendor invoiced before the delivery physically arrived.", "next": "Confirm with the receiving team whether the 325 units of “Finally Panel” actually arrived. If they did, have them post the goods receipt so the invoice can be matched.", "tcode": "MIGO → MRBR", "tnote": "Post the goods receipt in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100181", "vendor": "Morales-Jones", "material": "Everyone Panel", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 180, "received": 180, "invoiced": 180, "blocked": 19877.40000000001, "blocked_fmt": "₹19,877", "expl": {"what": "The vendor invoiced “Everyone Panel” at ₹563.86 per unit, but the purchase order agreed ₹453.43 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100006", "vendor": "Snyder, Campos and Callahan", "material": "Seven Bearing", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "MUST_ESCALATE", "ordered": 360, "received": 349, "invoiced": 360, "blocked": 18207.199999999953, "blocked_fmt": "₹18,207", "expl": {"what": "The vendor billed for 360 units of “Seven Bearing”, but the warehouse only recorded 349 units received. SAP blocked the invoice for the 11-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 11-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100025", "vendor": "Flowers, Martin and Kelly", "material": "Grow Motor", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 226, "received": 211, "invoiced": 226, "blocked": 14374.049999999988, "blocked_fmt": "₹14,374", "expl": {"what": "The vendor billed for 226 units of “Grow Motor”, but the warehouse only recorded 211 units received. SAP blocked the invoice for the 15-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 15-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100144", "vendor": "Rodriguez, Figueroa and Sanchez", "material": "Activity Bearing", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 76, "received": 71, "invoiced": 76, "blocked": 13620.350000000006, "blocked_fmt": "₹13,620", "expl": {"what": "The vendor billed for 76 units of “Activity Bearing”, but the warehouse only recorded 71 units received. SAP blocked the invoice for the 5-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 5-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100098", "vendor": "Adams, Zuniga and Wong", "material": "Newspaper Cable", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "MUST_ESCALATE", "ordered": 68, "received": 68, "invoiced": 68, "blocked": 12001.320000000007, "blocked_fmt": "₹12,001", "expl": {"what": "The vendor invoiced “Newspaper Cable” at ₹2,922.07 per unit, but the purchase order agreed ₹2,745.58 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100161", "vendor": "Reid, Ferguson and Sanchez", "material": "Knowledge Valve", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 89, "received": 80, "invoiced": 89, "blocked": 7462.619999999995, "blocked_fmt": "₹7,462", "expl": {"what": "The vendor billed for 89 units of “Knowledge Valve”, but the warehouse only recorded 80 units received. SAP blocked the invoice for the 9-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 9-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100172", "vendor": "Henderson, Ramirez and Lewis", "material": "Pick Valve", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 141, "received": 135, "invoiced": 141, "blocked": 6159.0, "blocked_fmt": "₹6,159", "expl": {"what": "The vendor billed for 141 units of “Pick Valve”, but the warehouse only recorded 135 units received. SAP blocked the invoice for the 6-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 6-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100175", "vendor": "Doyle Ltd", "material": "Value Cable", "defect": "PRICE_MISMATCH", "defect_label": "Price mismatch", "path": "AUTO_RESOLVABLE", "ordered": 47, "received": 47, "invoiced": 47, "blocked": 4872.490000000005, "blocked_fmt": "₹4,872", "expl": {"what": "The vendor invoiced “Value Cable” at ₹1,690.19 per unit, but the purchase order agreed ₹1,586.52 per unit. SAP blocked the invoice because the billed price doesn't match the agreed price.", "why": "The vendor may have applied an unapproved price increase, or the purchase order price was never updated after a renegotiation.", "next": "Compare the invoice price against the PO price and confirm which is correct with procurement before releasing payment.", "tcode": "ME23N → MRBR", "tnote": "Verify the PO price in ME23N, then release the blocked invoice in MRBR."}}, {"po": "45100196", "vendor": "Flowers, Martin and Kelly", "material": "Everyone Panel", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 226, "received": 224, "invoiced": 226, "blocked": 1200.7399999999907, "blocked_fmt": "₹1,200", "expl": {"what": "The vendor billed for 226 units of “Everyone Panel”, but the warehouse only recorded 224 units received. SAP blocked the invoice for the 2-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 2-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}, {"po": "45100021", "vendor": "Henderson, Ramirez and Lewis", "material": "Serve Motor", "defect": "QTY_OVERBILLED", "defect_label": "Quantity overbilled", "path": "AUTO_RESOLVABLE", "ordered": 13, "received": 12, "invoiced": 13, "blocked": 401.4200000000001, "blocked_fmt": "₹401", "expl": {"what": "The vendor billed for 13 units of “Serve Motor”, but the warehouse only recorded 12 units received. SAP blocked the invoice for the 1-unit gap between what was billed and what arrived.", "why": "Either the vendor over-billed, or part of the shipment is still in transit and hasn't been received into the system yet.", "next": "Verify the received quantity against the delivery, and query the 1-unit difference with the vendor.", "tcode": "MIGO → MRBR", "tnote": "Check received quantities in MIGO, then release the blocked invoice in MRBR."}}], "summary": {"total": 4624558.44, "total_fmt": "₹46,24,558.44", "n": 32, "auto": 7, "escalate": 25, "auto_pct": 22}};
+let selected = DATA.rows[0].po;
+const cleared = new Set();
+const DEFECT_MAP = {"Missing goods receipt":"MISSING_GOODS_RECEIPT","Price mismatch":"PRICE_MISMATCH","Quantity overbilled":"QTY_OVERBILLED"};
+
+function doLogin(){
+  const u=document.getElementById('uid').value.trim();
+  const p=document.getElementById('pwd').value;
+  if(u==='ap.clerk' && p==='patchamomma2026'){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    initHero(); render();
+  } else {
+    document.getElementById('lerr').textContent='Incorrect credentials. Use the demo login shown above.';
+  }
+}
+function logout(){ location.reload(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Enter' && document.getElementById('app').style.display!=='block') doLogin(); });
+
+function initHero(){
+  const s=DATA.summary;
+  document.getElementById('h-total').textContent=s.total_fmt;
+  document.getElementById('h-note').textContent='across '+s.n+' invoices held by three-way-match failures';
+  document.getElementById('h-auto').textContent=s.auto_pct+'%';
+  document.getElementById('h-esc').textContent=s.escalate;
+}
+
+function filtered(){
+  const fd=document.getElementById('f-defect').value;
+  const fp=document.getElementById('f-path').value;
+  return DATA.rows.filter(r=>{
+    if(fd!=='All' && r.defect!==DEFECT_MAP[fd]) return false;
+    if(fp==='Needs a human' && r.path!=='MUST_ESCALATE') return false;
+    if(fp==='Auto-clearable' && r.path!=='AUTO_RESOLVABLE') return false;
+    return true;
+  });
+}
+
+function render(){
+  const rows=filtered();
+  if(rows.length && !rows.some(r=>r.po===selected)) selected=rows[0].po;
+  const vt=rows.reduce((a,r)=>a+r.blocked,0);
+  document.getElementById('count-line').innerHTML='Showing <b>'+rows.length+'</b> of '+DATA.rows.length+' &middot; <b style="color:var(--money)">'+fmt(vt)+'</b> in view &mdash; highest value first.';
+  document.getElementById('h-cleared').textContent=cleared.size;
+
+  const q=document.getElementById('queue'); q.innerHTML='';
+  if(!rows.length){ q.innerHTML='<div class="sechint">No invoices match these filters.</div>'; }
+  rows.forEach(r=>{
+    const sev=r.defect==='MISSING_GOODS_RECEIPT';
+    const auto=r.path==='AUTO_RESOLVABLE';
+    const done=cleared.has(r.po);
+    const sel=r.po===selected;
+    const cls='row'+(sev?' sev':'')+(sel?' sel':'')+(done?' done':'');
+    let chips='<span class="chip '+(auto?'chip-auto':'chip-esc')+'">'+(auto?'Auto-clearable':'Needs a human')+'</span>';
+    if(sev) chips+='<span class="chip chip-sev">Highest severity</span>';
+    if(done) chips+='<span class="chip chip-done">Cleared &#10003;</span>';
+    const div=document.createElement('div');
+    div.className=cls;
+    div.onclick=()=>{selected=r.po; render();};
+    div.innerHTML='<div class="main"><div class="po">'+(sel?'&#9656; ':'')+'PO '+r.po+'</div>'+
+      '<div class="vd">'+esc(r.vendor)+' &middot; '+r.defect_label+'</div>'+
+      '<div class="chips">'+chips+'</div></div>'+
+      '<div class="amt">'+r.blocked_fmt+'</div>';
+    q.appendChild(div);
+  });
+  renderDetail();
+}
+
+function renderDetail(){
+  const r=DATA.rows.find(x=>x.po===selected);
+  if(!r){document.getElementById('detail').innerHTML='';return;}
+  const auto=r.path==='AUTO_RESOLVABLE';
+  const done=cleared.has(r.po);
+  const recv = r.received===null? '&mdash;' : r.received;
+  const recvCls = r.received===null? 'v miss':'v';
+  const e=r.expl;
+  let actions='';
+  if(auto){
+    if(done){
+      actions='<div class="cleared-msg">&#10003; Cleared by you &mdash; this auto-resolvable case is marked resolved.</div>'+
+              '<button class="btn" style="margin-top:8px" onclick="undoClear(\''+r.po+'\')">Undo clear</button>';
+    } else {
+      actions='<button class="btn" style="background:var(--money);color:#fff;border-color:var(--money)" onclick="clearCase(\''+r.po+'\')">&#10003; Clear this case ('+r.blocked_fmt+')</button>';
+    }
+  } else {
+    actions='<div class="cap">This case needs a human &mdash; use <b>'+e.tcode+'</b> in SAP to resolve, then it can be released.</div>';
+  }
+  document.getElementById('detail').innerHTML=
+    '<div class="file"><div class="fhead"><div class="po">PO '+r.po+'</div>'+
+    '<div class="sub">'+esc(r.vendor)+' &middot; '+esc(r.material)+' &middot; '+r.defect_label+'</div></div>'+
+    '<div class="nums">'+
+      '<div class="num"><div class="k">Ordered</div><div class="v">'+r.ordered+'</div></div>'+
+      '<div class="num"><div class="k">Received</div><div class="'+recvCls+'">'+recv+'</div></div>'+
+      '<div class="num"><div class="k">Invoiced</div><div class="v">'+r.invoiced+'</div></div>'+
+      '<div class="num"><div class="k">Blocked</div><div class="v" style="color:var(--money)">'+r.blocked_fmt+'</div></div>'+
+    '</div>'+
+    '<div class="tband'+(auto?' auto':'')+'"><span class="tcode">'+e.tcode+'</span><span class="tnote">'+e.tnote+'</span></div>'+
+    '<div class="expl">'+
+      '<h4>What went wrong</h4><p>'+esc(e.what)+'</p>'+
+      '<h4>Why it likely happened</h4><p>'+esc(e.why)+'</p>'+
+      '<h4>What to do next</h4><p>'+esc(e.next)+'</p>'+
+      '<h4>SAP transaction</h4><p class="sap">'+e.tcode+' &mdash; '+esc(e.tnote)+'</p>'+
+    '</div>'+
+    '<div class="actions">'+actions+'</div></div>';
+}
+
+function clearCase(po){ cleared.add(po); render(); }
+function undoClear(po){ cleared.delete(po); render(); }
+function fmt(x){ let n=Math.round(x); let s=String(n); if(s.length>3){let l=s.slice(-3),rest=s.slice(0,-3),p=[];while(rest.length>2){p.unshift(rest.slice(-2));rest=rest.slice(0,-2);}if(rest)p.unshift(rest);s=p.join(',')+','+l;} return '\u20B9'+s; }
+function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+</script>
+</body>
+</html>
